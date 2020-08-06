@@ -15,6 +15,7 @@ using Web_Api_Macorrati.Context;
 using Web_Api_Macorrati.Extensions;
 using Web_Api_Macorrati.Filters;
 using Web_Api_Macorrati.Logging;
+using Web_Api_Macorrati.Repository;
 using Web_Api_Macorrati.Services;
 
 namespace Web_Api_Macorrati
@@ -31,7 +32,9 @@ namespace Web_Api_Macorrati
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<ApiLoggingFilter>(); 
+            services.AddScoped<ApiLoggingFilter>();
+            //Registrando padrão Unit Of Work como um serviço 
+            services.AddScoped<IUnitOfWork, UnitOfWork>(); 
 
             services.AddDbContext<AppDbContext>(options =>
             options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));

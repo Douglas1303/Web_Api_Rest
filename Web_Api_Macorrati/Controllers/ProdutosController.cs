@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Web_Api_Macorrati.Context;
 using Web_Api_Macorrati.Filters;
 using Web_Api_Macorrati.Models;
+using Web_Api_Macorrati.Repository;
 
 namespace Web_Api_Macorrati.Controllers
 {
@@ -14,23 +14,29 @@ namespace Web_Api_Macorrati.Controllers
     [ApiController]
     public class ProdutosController : ControllerBase
     {
-        private readonly AppDbContext _contexto;
-        public ProdutosController(AppDbContext contexto)
+        private readonly IUnitOfWork _uof;
+        public ProdutosController(IUnitOfWork context)
         {
-            _contexto = contexto;
+            _uof = context;
+        }
+
+        [HttpGet("menorpreco")]
+        public ActionResult<IEnumerable<Produto>> GetProdutosPrecos()
+        {
+            return _uof.ProdutoRepository.GetProdutosPorPreco().ToList(); 
         }
 
         [HttpGet]
-        [ServiceFilter(typeof(ApiLoggingFilter))]
-        public async Task<ActionResult<IEnumerable<Produto>>> Get()
+        //[ServiceFilter(typeof(ApiLoggingFilter))]
+        public ActionResult<IEnumerable<Produto>> Get()
         {
-            return await _contexto.Produtos.AsNoTracking().ToListAsync();
+            return _uof.ProdutoRepository.Get().ToList();
         }
 
         [HttpGet("{id:int:min(1)}", Name = "ObterProduto")]
-        public async Task<ActionResult<Produto>> Get(int id)
+        public ActionResult<Produto> Get(int id)
         {
-            var produto = await _contexto.Produtos.AsNoTracking().FirstOrDefaultAsync(p => p.ProdutoId == id);
+            var produto =  _uof.ProdutoRepository.GetById(p => p.ProdutoId == id);
 
             if (produto == null)
             {
@@ -43,13 +49,8 @@ namespace Web_Api_Macorrati.Controllers
         [HttpPost]
         public ActionResult Post([FromBody]Produto produto)
         {
-            //if (!ModelState.IsValid)
-            //{
-            //    return BadRequest(ModelState); 
-            //}
-
-            _contexto.Produtos.Add(produto);
-            _contexto.SaveChanges();
+            _uof.ProdutoRepository.Add(produto);
+            _uof.Commit(); 
 
             return new CreatedAtRouteResult("ObterProduto", new {id = produto.ProdutoId }, produto);
         }
@@ -62,9 +63,8 @@ namespace Web_Api_Macorrati.Controllers
                 return BadRequest(); 
             }
 
-            _contexto.Entry(produto).State = EntityState.Modified;
-
-            _contexto.SaveChanges();
+            _uof.ProdutoRepository.Update(produto);
+            _uof.Commit(); 
 
             return Ok(); 
         }
@@ -72,15 +72,15 @@ namespace Web_Api_Macorrati.Controllers
         [HttpDelete("{id}")]
         public ActionResult<Produto> Delete(int id)
         {
-            var produto = _contexto.Produtos.FirstOrDefault(p => p.ProdutoId == id);
+            var produto = _uof.ProdutoRepository.GetById(p => p.ProdutoId == id); 
 
             if (produto == null)
             {
                 return NotFound(); 
             }
 
-            _contexto.Remove(produto);
-            _contexto.SaveChanges();
+            _uof.ProdutoRepository.Delete(produto);
+            _uof.Commit(); 
 
             return produto; 
         }
