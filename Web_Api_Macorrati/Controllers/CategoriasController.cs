@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Web_Api_Macorrati.Context;
 using Web_Api_Macorrati.Models;
+using Web_Api_Macorrati.Repository;
 
 namespace Web_Api_Macorrati.Controllers
 {
@@ -14,32 +15,30 @@ namespace Web_Api_Macorrati.Controllers
     [ApiController]
     public class CategoriasController : ControllerBase
     {
-        private readonly AppDbContext _contexto;
-        private readonly ILogger _logger; 
+        private readonly IUnitOfWork _uof; 
 
-        public CategoriasController(AppDbContext contexto, 
-                                    ILogger<CategoriasController> logger)
+        public CategoriasController(IUnitOfWork context)
         {
-            _contexto = contexto;
-            _logger = logger;
+            _uof = context;
+ 
         }
 
         [HttpGet("produtos")] //Retornas as categorias e os produtos 
         public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
         {
-            return _contexto.Categorias.Include(x => x.Produtos).ToList();
+            return _uof.CategoriaRepository.GetCategoriasProdutos().ToList(); 
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
-            return _contexto.Categorias.AsNoTracking().ToList();
+            return _uof.CategoriaRepository.Get().ToList();
         }
 
         [HttpGet("{id}", Name = "ObterCategoria")]
         public ActionResult<Categoria> Get(int id)
         {
-            var categoria = _contexto.Categorias.AsNoTracking().FirstOrDefault(c => c.CategoriaId == id);
+            var categoria = _uof.CategoriaRepository.GetById(c => c.CategoriaId == id);
 
             if (categoria == null)
             {
@@ -52,8 +51,8 @@ namespace Web_Api_Macorrati.Controllers
         [HttpPost]
         public ActionResult Post([FromBody] Categoria categoria)
         {
-            _contexto.Add(categoria);
-            _contexto.SaveChanges();
+            _uof.CategoriaRepository.Add(categoria);
+            _uof.Commit();
 
             return new CreatedAtRouteResult("ObterCategoria", new { id = categoria.CategoriaId }, categoria);
         }
@@ -66,8 +65,8 @@ namespace Web_Api_Macorrati.Controllers
                 return BadRequest();
             }
 
-            _contexto.Entry(categoria).State = EntityState.Modified;
-            _contexto.SaveChanges();
+            _uof.CategoriaRepository.Update(categoria); 
+            _uof.Commit();
 
             return Ok();
         }
@@ -75,15 +74,15 @@ namespace Web_Api_Macorrati.Controllers
         [HttpDelete("{id}")]
         public ActionResult<Categoria> Delete(int id)
         {
-            var categoria = _contexto.Categorias.FirstOrDefault(c => c.CategoriaId == id);
+            var categoria = _uof.CategoriaRepository.GetById(c => c.CategoriaId == id); 
 
             if (categoria == null) 
             {
                 return NotFound(); 
             }
 
-            _contexto.Remove(categoria);
-            _contexto.SaveChanges(); 
+            _uof.CategoriaRepository.Delete(categoria);
+            _uof.Commit(); 
 
             return categoria; 
         }
