@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30225.117
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web_Api_Macorrati", "Web_Api_Macorrati\Web_Api_Macorrati.csproj", "{68FF698B-3B5C-4A19-A523-046FDD717B96}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{68FF698B-3B5C-4A19-A523-046FDD717B96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68FF698B-3B5C-4A19-A523-046FDD717B96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68FF698B-3B5C-4A19-A523-046FDD717B96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68FF698B-3B5C-4A19-A523-046FDD717B96}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E59A7118-C027-46F9-B2D8-E090B19FE938}
+	EndGlobalSection
+EndGlobal
