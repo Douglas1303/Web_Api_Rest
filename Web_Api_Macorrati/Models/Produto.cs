@@ -33,7 +33,7 @@ namespace Web_Api_Macorrati.Models
 
         public float Estoque { get; set; }
 
-        public DateTime DataCadastro { get; set; } 
+        public DateTime DataCadastro { get; set; } = DateTime.Now; 
 
         public int CategoriaId { get; set; }
         public virtual Categoria Categoria { get; set; }
