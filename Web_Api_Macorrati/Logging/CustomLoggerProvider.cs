@@ -1,31 +1,31 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿//using Microsoft.Extensions.Logging;
+//using System;
+//using System.Collections.Concurrent;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Threading.Tasks;
 
-namespace Web_Api_Macorrati.Logging
-{
-    public class CustomLoggerProvider : ILoggerProvider
-    {
-        readonly CustomLoggerProviderConfiguration loggerConfig;
+//namespace Web_Api_Macorrati.Logging
+//{
+//    public class CustomLoggerProvider : ILoggerProvider
+//    {
+//        readonly CustomLoggerProviderConfiguration loggerConfig;
 
-        readonly ConcurrentDictionary<string, CustomerLogger> loggers =
-            new ConcurrentDictionary<string, CustomerLogger>();
+//        readonly ConcurrentDictionary<string, CustomerLogger> loggers =
+//            new ConcurrentDictionary<string, CustomerLogger>();
 
-        public CustomLoggerProvider(CustomLoggerProviderConfiguration config)
-        {
-            loggerConfig = config; 
-        }
-        public ILogger CreateLogger(string categoryName)
-        {
-            return loggers.GetOrAdd(categoryName, name => new CustomerLogger(name, loggerConfig)); 
-        }
+//        public CustomLoggerProvider(CustomLoggerProviderConfiguration config)
+//        {
+//            loggerConfig = config; 
+//        }
+//        public ILogger CreateLogger(string categoryName)
+//        {
+//            return loggers.GetOrAdd(categoryName, name => new CustomerLogger(name, loggerConfig)); 
+//        }
 
-        public void Dispose()
-        {
-            loggers.Clear(); 
-        }
-    }
-}
+//        public void Dispose()
+//        {
+//            loggers.Clear(); 
+//        }
+//    }
+//}
