@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -50,6 +51,11 @@ namespace Web_Api_Macorrati
             services.AddDbContext<AppDbContext>(options =>
             options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
 
+            //Registrando Identity
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<AppDbContext>()
+                .AddDefaultTokenProviders(); 
+
             services.AddTransient<IMeuServico, MeuServico>(); 
 
             services.AddControllers()
@@ -79,7 +85,9 @@ namespace Web_Api_Macorrati
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
+            //middleware de autenticação 
+            app.UseAuthentication();
+            //middleware de autorização
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

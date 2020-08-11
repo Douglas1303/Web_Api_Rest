@@ -15,15 +15,18 @@ namespace Web_Api_Macorrati.Models
         public int ProdutoId { get; set; }
 
         [Required(ErrorMessage = "O nome é obrigatório!")]
-        [StringLength(20, ErrorMessage = "O nome deve ter entre 5 e 20 caracteres!", MinimumLength = 5)]
+        [StringLength(80, ErrorMessage = "O nome deve ter entre 5 e 20 caracteres!", MinimumLength = 5)]
         //[PrimeiraLetraMaiuscula]
         public string Nome { get; set; }
 
         [Required]
-        [StringLength(10, ErrorMessage = "A descrição deve conter no máximo {1} caracteres!")]
+        [MaxLength(300)]
+        [StringLength(300, ErrorMessage = "A descrição deve conter no máximo {1} caracteres!")]
         public string Descricao { get; set; }
 
         [Required]
+        [DataType(DataType.Currency)]
+        [Column(TypeName = "decimal(8,2)")]
         [Range(1, 1000, ErrorMessage = "O preço deve estar entre {1} e {2}")]
         public decimal Preco { get; set; }
 
