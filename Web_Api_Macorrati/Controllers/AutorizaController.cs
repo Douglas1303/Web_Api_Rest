@@ -8,7 +8,7 @@ using Web_Api_Macorrati.DTOs;
 
 namespace Web_Api_Macorrati.Controllers
 {
-    [Route("api/controller")]
+    [Route("api/[controller]")]
     [ApiController]
     public class AutorizaController : ControllerBase
     {
