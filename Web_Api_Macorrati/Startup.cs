@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -13,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Web_Api_Macorrati.Context;
 using Web_Api_Macorrati.DTOs.Mappings;
 using Web_Api_Macorrati.Extensions;
@@ -35,6 +38,15 @@ namespace Web_Api_Macorrati
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options => 
+            {
+                options.AddPolicy("PermitirApiRequest",
+                    builder =>
+                    builder.WithOrigins("http://apirequest.io/")
+                    .WithMethods("GET")
+                    ); 
+            }); 
+
             //Config Auto mapper
             var mappingConfig = new MapperConfiguration(mc =>
             {
@@ -54,7 +66,22 @@ namespace Web_Api_Macorrati
             //Registrando Identity
             services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
-                .AddDefaultTokenProviders(); 
+                .AddDefaultTokenProviders();
+
+            services.AddAuthentication(
+                JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true, 
+                    ValidateAudience = true, 
+                    ValidateLifetime = true, 
+                    ValidAudience = Configuration["TokenConfiguration:Audience"], 
+                    ValidIssuer = Configuration["TokenConfiguration:Issuer"],
+                    ValidateIssuerSigningKey = true, 
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(Configuration["Jwt:key"]))
+                }); 
 
             services.AddTransient<IMeuServico, MeuServico>(); 
 
@@ -89,6 +116,9 @@ namespace Web_Api_Macorrati
             app.UseAuthentication();
             //middleware de autorização
             app.UseAuthorization();
+
+            //CORS
+            app.UseCors();
 
             app.UseEndpoints(endpoints =>
             {
