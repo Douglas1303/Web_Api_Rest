@@ -18,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Web_Api_Macorrati.Context;
 using Web_Api_Macorrati.DTOs.Mappings;
 using Web_Api_Macorrati.Extensions;
@@ -40,14 +41,14 @@ namespace Web_Api_Macorrati
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors(options => 
+            services.AddCors(options =>
             {
                 options.AddPolicy("PermitirApiRequest",
                     builder =>
                     builder.WithOrigins("http://apirequest.io/")
                     .WithMethods("GET")
-                    ); 
-            }); 
+                    );
+            });
 
             //Config Auto mapper
             var mappingConfig = new MapperConfiguration(mc =>
@@ -56,11 +57,11 @@ namespace Web_Api_Macorrati
             });
 
             IMapper mapper = mappingConfig.CreateMapper();
-            services.AddSingleton(mapper); 
+            services.AddSingleton(mapper);
 
             services.AddScoped<ApiLoggingFilter>();
             //Registrando padrão Unit Of Work como um serviço 
-            services.AddScoped<IUnitOfWork, UnitOfWork>(); 
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddDbContext<AppDbContext>(options =>
             options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
@@ -75,36 +76,59 @@ namespace Web_Api_Macorrati
                 .AddJwtBearer(options =>
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = true, 
-                    ValidateAudience = true, 
-                    ValidateLifetime = true, 
-                    ValidAudience = Configuration["TokenConfiguration:Audience"], 
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidAudience = Configuration["TokenConfiguration:Audience"],
                     ValidIssuer = Configuration["TokenConfiguration:Issuer"],
-                    ValidateIssuerSigningKey = true, 
+                    ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(
                     Encoding.UTF8.GetBytes(Configuration["Jwt:key"]))
                 });
 
-            services.AddApiVersioning(options =>
+            //Swagger 
+            services.AddSwaggerGen(c =>
             {
-                options.AssumeDefaultVersionWhenUnspecified = true;
-                options.DefaultApiVersion = new ApiVersion(1, 0);
-                options.ReportApiVersions = true;
-                options.ApiVersionReader = new HeaderApiVersionReader("x-api-version");
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "CatalogoAPI",
+                    Description = "Catálogo de Produtos e Categorias",
+                    TermsOfService = new Uri("https://macoratti.net/terms"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "macoratti",
+                        Email = "macoratti@yahoo.com",
+                        Url = new Uri("https://www.macoratti.net"),
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "Usar sobre LICX",
+                        Url = new Uri("https://macoratti.net/license"),
+                    }
+                });
             });
 
-            services.AddTransient<IMeuServico, MeuServico>(); 
+            //services.AddApiVersioning(options =>
+            //{
+            //    options.AssumeDefaultVersionWhenUnspecified = true;
+            //    options.DefaultApiVersion = new ApiVersion(1, 0);
+            //    options.ReportApiVersions = true;
+            //    options.ApiVersionReader = new HeaderApiVersionReader("x-api-version");
+            //});
+
+            //services.AddTransient<IMeuServico, MeuServico>();
 
             services.AddControllers()
                 .AddNewtonsoftJson(options =>
                 {
                     options.SerializerSettings.ReferenceLoopHandling
-                    = Newtonsoft.Json.ReferenceLoopHandling.Ignore; 
+                    = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                 });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -117,7 +141,7 @@ namespace Web_Api_Macorrati
             //})); 
 
             //Adicionando o middleware de tratamento de erros 
-            app.ConfigureExceptionHandler(); 
+            app.ConfigureExceptionHandler();
 
             app.UseHttpsRedirection();
 
@@ -127,8 +151,18 @@ namespace Web_Api_Macorrati
             //middleware de autorização
             app.UseAuthorization();
 
-            //CORS
-            app.UseCors();
+            //Swagger
+            app.UseSwagger();
+
+            //SwaggerUI
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json",
+                    "Cátalogo de Produtos e Categorias");
+            });
+
+            ////CORS
+            //app.UseCors();
 
             app.UseEndpoints(endpoints =>
             {
