@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -94,19 +96,23 @@ namespace Web_Api_Macorrati
                     Version = "v1",
                     Title = "CatalogoAPI",
                     Description = "Catálogo de Produtos e Categorias",
-                    TermsOfService = new Uri("https://macoratti.net/terms"),
+                    TermsOfService = new Uri("https://douglas.net/terms"),
                     Contact = new OpenApiContact
                     {
                         Name = "macoratti",
                         Email = "macoratti@yahoo.com",
-                        Url = new Uri("https://www.macoratti.net"),
+                        Url = new Uri("https://www.douglas.net"),
                     },
                     License = new OpenApiLicense
                     {
                         Name = "Usar sobre LICX",
-                        Url = new Uri("https://macoratti.net/license"),
+                        Url = new Uri("https://douglas.net/license"),
                     }
                 });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
 
             //services.AddApiVersioning(options =>

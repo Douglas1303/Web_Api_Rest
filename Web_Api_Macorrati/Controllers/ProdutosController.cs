@@ -12,6 +12,8 @@ using Web_Api_Macorrati.Repository;
 
 namespace Web_Api_Macorrati.Controllers
 {
+    [ApiConventionType(typeof(DefaultApiConventions))]
+    [Produces("application/json")]
     [Route("api/[Controller]")]
     [ApiController]
     public class ProdutosController : ControllerBase
@@ -25,6 +27,11 @@ namespace Web_Api_Macorrati.Controllers
             _mapper = mapper; 
         }
 
+        /// <summary>
+        /// Obtém os produtos ordenados por preço na ordem ascendente
+        /// </summary>
+        /// <param name="none"></param>
+        /// <returns>Lista de objetos Produtos ordenados por preço</returns>
         [HttpGet("menorpreco")]
         public ActionResult<IEnumerable<ProdutoDTO>> GetProdutosPrecos()
         {
@@ -34,8 +41,12 @@ namespace Web_Api_Macorrati.Controllers
             return produtosDTO; 
         }
 
+        /// <summary>
+        /// Exibe uma relação dos produtos
+        /// </summary>
+        /// <returns>Retorna uma lista de objetos Produto</returns>
+        // api/produtos
         [HttpGet]
-        //[ServiceFilter(typeof(ApiLoggingFilter))]
         public ActionResult<IEnumerable<ProdutoDTO>> Get()
         {  
             var produtos = _uof.ProdutoRepository.Get().ToList();
@@ -45,6 +56,11 @@ namespace Web_Api_Macorrati.Controllers
             return produtosDTO; 
         }
 
+        /// <summary>
+        /// Obtem o produto pelo seu identificado produtoId
+        /// </summary>
+        /// <param name="id">Código do produto</param>
+        /// <returns>Um objeto Produto</returns>
         [HttpGet("{id:int:min(1)}", Name = "ObterProduto")]
         public ActionResult<ProdutoDTO> Get(int id)
         {
@@ -60,6 +76,11 @@ namespace Web_Api_Macorrati.Controllers
             return produtoDTO; 
         }
 
+        /// <summary>
+        /// Incluir um novo produto
+        /// </summary>
+        /// <param name="produtoDto"></param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult Post([FromBody]ProdutoDTO produtoDto)
         {
@@ -73,6 +94,7 @@ namespace Web_Api_Macorrati.Controllers
             return new CreatedAtRouteResult("ObterProduto", new {id = produto.ProdutoId }, produtoDTO);
         }
 
+        //  api/produtos/1
         [HttpPut("{id}")]
         public ActionResult Put(int id, [FromBody] ProdutoDTO produtoDto)
         {
@@ -89,6 +111,7 @@ namespace Web_Api_Macorrati.Controllers
             return Ok(); 
         }
 
+        //  api/produtos/1
         [HttpDelete("{id}")]
         public ActionResult<ProdutoDTO> Delete(int id)
         {

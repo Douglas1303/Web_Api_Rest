@@ -14,6 +14,8 @@ using Web_Api_Macorrati.DTOs;
 
 namespace Web_Api_Macorrati.Controllers
 {
+    [ApiConventionType(typeof(DefaultApiConventions))]
+    [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     public class AutorizaController : ControllerBase
@@ -38,6 +40,12 @@ namespace Web_Api_Macorrati.Controllers
                 + DateTime.Now.ToLongDateString(); 
         }
 
+        /// <summary>
+        /// Registra um novo usuário
+        /// </summary>
+        /// <param name="model">Um objeto UsuarioDTO</param>
+        /// <returns>Status 200 e o token para o cliente</returns>
+        /// <remarks>retorna o Status 200 e o token para  novo cliente</remarks>
         [HttpPost("Register")]
         public async Task<ActionResult> RegisterUser([FromBody] UsuarioDTO model)
         {
@@ -66,6 +74,11 @@ namespace Web_Api_Macorrati.Controllers
             return Ok(GeraToken(model)); 
         }
 
+        /// <summary>
+        /// Verifica as credenciais de um usuário
+        /// </summary>
+        /// <param name="userInfo">Um objeto do tipo UsuarioDTO</param>
+        /// <returns>Status 200 e o token para o cliente</returns>
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] UsuarioDTO userInfo)
         {

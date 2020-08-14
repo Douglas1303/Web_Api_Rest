@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Web_Api_Macorrati</name>
+    </assembly>
+    <members>
+        <member name="M:Web_Api_Macorrati.Controllers.AutorizaController.RegisterUser(Web_Api_Macorrati.DTOs.UsuarioDTO)">
+            <summary>
+            Registra um novo usuário
+            </summary>
+            <param name="model">Um objeto UsuarioDTO</param>
+            <returns>Status 200 e o token para o cliente</returns>
+            <remarks>retorna o Status 200 e o token para  novo cliente</remarks>
+        </member>
+        <member name="M:Web_Api_Macorrati.Controllers.AutorizaController.Login(Web_Api_Macorrati.DTOs.UsuarioDTO)">
+            <summary>
+            Verifica as credenciais de um usuário
+            </summary>
+            <param name="userInfo">Um objeto do tipo UsuarioDTO</param>
+            <returns>Status 200 e o token para o cliente</returns>
+        </member>
+        <member name="M:Web_Api_Macorrati.Controllers.CategoriasController.GetCategoriasProdutos">
+            <summary>
+            Obtém os produtos relacionados para cada categoria
+            </summary>
+            <returns>Objetos Categoria e respectivo Objetos Produtos</returns>
+        </member>
+        <member name="M:Web_Api_Macorrati.Controllers.CategoriasController.Get">
+            <summary>
+            Retorna uma coleção de objetos Categoria
+            </summary>
+            <returns>Lista de Categorias</returns>
+        </member>
+        <member name="M:Web_Api_Macorrati.Controllers.CategoriasController.Get(System.Int32)">
+            <summary>
+            Obter uma categoria pelo id 
+            </summary>
+            <param name="id">Codigo sa categoria</param>
+            <returns>Objetos Categoria</returns>
+        </member>
+        <member name="M:Web_Api_Macorrati.Controllers.CategoriasController.Post(Web_Api_Macorrati.DTOs.CategoriaDTO)">
+             <summary>
+             Inclui uma nova categoria
+             </summary>
+             <remarks>
+             Exemplo de request:
+            
+                 POST api/categorias
+                 {
+                    "categoriaId": 1,
+                    "nome": "categoria1",
+                    "imagemUrl": "http://teste.net/1.jpg"
+                 }
+             </remarks>
+             <param name="categoriaDto">objeto Categoria</param>
+             <returns>O objeto Categoria incluida</returns>
+             <remarks>Retorna um objeto Categoria incluído</remarks>
+        </member>
+        <member name="M:Web_Api_Macorrati.Controllers.ProdutosController.GetProdutosPrecos">
+            <summary>
+            Obtém os produtos ordenados por preço na ordem ascendente
+            </summary>
+            <param name="none"></param>
+            <returns>Lista de objetos Produtos ordenados por preço</returns>
+        </member>
+        <member name="M:Web_Api_Macorrati.Controllers.ProdutosController.Get">
+            <summary>
+            Exibe uma relação dos produtos
+            </summary>
+            <returns>Retorna uma lista de objetos Produto</returns>
+        </member>
+        <member name="M:Web_Api_Macorrati.Controllers.ProdutosController.Get(System.Int32)">
+            <summary>
+            Obtem o produto pelo seu identificado produtoId
+            </summary>
+            <param name="id">Código do produto</param>
+            <returns>Um objeto Produto</returns>
+        </member>
+        <member name="M:Web_Api_Macorrati.Controllers.ProdutosController.Post(Web_Api_Macorrati.DTOs.ProdutoDTO)">
+            <summary>
+            Incluir um novo produto
+            </summary>
+            <param name="produtoDto"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

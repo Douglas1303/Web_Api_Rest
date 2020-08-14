@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -15,6 +16,8 @@ using Web_Api_Macorrati.Repository;
 
 namespace Web_Api_Macorrati.Controllers
 {
+    [ApiConventionType(typeof(DefaultApiConventions))] // Documenta todos os tipos de retornos no swagger
+    [Produces("application/json")]
     //[Authorize(AuthenticationSchemes = "Bearer")]
     [Route("api/[Controller]")]
     [ApiController]
@@ -31,6 +34,10 @@ namespace Web_Api_Macorrati.Controllers
  
         }
 
+        /// <summary>
+        /// Obtém os produtos relacionados para cada categoria
+        /// </summary>
+        /// <returns>Objetos Categoria e respectivo Objetos Produtos</returns>
         [HttpGet("produtos")] //Retornas as categorias e os produtos 
         public ActionResult<IEnumerable<CategoriaDTO>> GetCategoriasProdutos()
         {
@@ -41,6 +48,10 @@ namespace Web_Api_Macorrati.Controllers
             return categoriasDTO; 
         }
 
+        /// <summary>
+        /// Retorna uma coleção de objetos Categoria
+        /// </summary>
+        /// <returns>Lista de Categorias</returns>
         [HttpGet]
         public ActionResult<IEnumerable<CategoriaDTO>> Get()
         {
@@ -51,6 +62,11 @@ namespace Web_Api_Macorrati.Controllers
             return categoriasDTO; 
         }
 
+        /// <summary>
+        /// Obter uma categoria pelo id 
+        /// </summary>
+        /// <param name="id">Codigo sa categoria</param>
+        /// <returns>Objetos Categoria</returns>
         [HttpGet("{id}", Name = "ObterCategoria")]
         public ActionResult<CategoriaDTO> Get(int id)
         {
@@ -66,6 +82,22 @@ namespace Web_Api_Macorrati.Controllers
             return categoriaDTO;
         }
 
+        /// <summary>
+        /// Inclui uma nova categoria
+        /// </summary>
+        /// <remarks>
+        /// Exemplo de request:
+        ///
+        ///     POST api/categorias
+        ///     {
+        ///        "categoriaId": 1,
+        ///        "nome": "categoria1",
+        ///        "imagemUrl": "http://teste.net/1.jpg"
+        ///     }
+        /// </remarks>
+        /// <param name="categoriaDto">objeto Categoria</param>
+        /// <returns>O objeto Categoria incluida</returns>
+        /// <remarks>Retorna um objeto Categoria incluído</remarks>
         [HttpPost]
         public ActionResult Post([FromBody] CategoriaDTO categoriaDto)
         {
