@@ -55,11 +55,19 @@ namespace Web_Api_Macorrati.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<CategoriaDTO>> Get()
         {
-            var categorias = _uof.CategoriaRepository.Get().ToList();
+            try
+            {
+                var categorias = _uof.CategoriaRepository.Get().ToList();
 
-            var categoriasDTO = _mapper.Map<List<CategoriaDTO>>(categorias);
+                var categoriasDTO = _mapper.Map<List<CategoriaDTO>>(categorias);
+                //throw new Exception(); //lançar uma exception para teste
+                return categoriasDTO;
+            }
+            catch (Exception)
+            {
 
-            return categoriasDTO; 
+                return BadRequest(); 
+            }
         }
 
         /// <summary>
