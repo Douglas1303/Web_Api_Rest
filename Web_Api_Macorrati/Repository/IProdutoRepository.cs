@@ -8,6 +8,6 @@ namespace Web_Api_Macorrati.Repository
 {
     public interface IProdutoRepository : IRepository<Produto>
     {
-        IEnumerable<Produto> GetProdutosPorPreco(); 
+        Task<IEnumerable<Produto>> GetProdutosPorPreco(); 
     }
 }

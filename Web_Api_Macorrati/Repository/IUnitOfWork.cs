@@ -10,6 +10,6 @@ namespace Web_Api_Macorrati.Repository
         IProdutoRepository ProdutoRepository { get; }
         ICategoriaRepository CategoriaRepository { get; }
 
-        void Commit(); 
+        Task Commit(); 
     }
 }

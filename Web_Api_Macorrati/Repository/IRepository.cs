@@ -10,7 +10,7 @@ namespace Web_Api_Macorrati.Repository
     public interface IRepository<T> //<T> define que é um repositorio generico
     {
         IQueryable<T> Get();
-        T GetById(Expression<Func<T, bool>> predicate);
+        Task<T> GetById(Expression<Func<T, bool>> predicate);
         void Add(T entity);
         void Update(T entity);
         void Delete(T entity); 

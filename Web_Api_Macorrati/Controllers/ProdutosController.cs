@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Web_Api_Macorrati.Context;
 using Web_Api_Macorrati.DTOs;
 using Web_Api_Macorrati.Filters;
@@ -12,6 +15,7 @@ using Web_Api_Macorrati.Repository;
 
 namespace Web_Api_Macorrati.Controllers
 {
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiConventionType(typeof(DefaultApiConventions))]
     [Produces("application/json")]
     [Route("api/[Controller]")]
@@ -33,9 +37,9 @@ namespace Web_Api_Macorrati.Controllers
         /// <param name="none"></param>
         /// <returns>Lista de objetos Produtos ordenados por preço</returns>
         [HttpGet("menorpreco")]
-        public ActionResult<IEnumerable<ProdutoDTO>> GetProdutosPrecos()
+        public async Task<ActionResult<IEnumerable<ProdutoDTO>>> GetProdutosPrecos()
         {
-            var produtos = _uof.ProdutoRepository.GetProdutosPorPreco().ToList();
+            var produtos = await _uof.ProdutoRepository.GetProdutosPorPreco();
             var produtosDTO = _mapper.Map<List<ProdutoDTO>>(produtos);
 
             return produtosDTO; 
@@ -47,13 +51,20 @@ namespace Web_Api_Macorrati.Controllers
         /// <returns>Retorna uma lista de objetos Produto</returns>
         // api/produtos
         [HttpGet]
-        public ActionResult<IEnumerable<ProdutoDTO>> Get()
-        {  
-            var produtos = _uof.ProdutoRepository.Get().ToList();
+        public async Task<ActionResult<IEnumerable<ProdutoDTO>>> Get()
+        {
+            try
+            {
+                var produtos = await _uof.ProdutoRepository.Get().ToListAsync();
 
-            var produtosDTO = _mapper.Map<List<ProdutoDTO>>(produtos);
-            
-            return produtosDTO; 
+                var produtosDTO = _mapper.Map<List<ProdutoDTO>>(produtos);
+                //throw new Exception();  //lançar uma exception para teste
+                return produtosDTO;
+            }
+            catch (Exception)
+            {
+                return BadRequest(); 
+            }
         }
 
         /// <summary>
@@ -62,9 +73,9 @@ namespace Web_Api_Macorrati.Controllers
         /// <param name="id">Código do produto</param>
         /// <returns>Um objeto Produto</returns>
         [HttpGet("{id:int:min(1)}", Name = "ObterProduto")]
-        public ActionResult<ProdutoDTO> Get(int id)
+        public async Task<ActionResult<ProdutoDTO>> Get(int id)
         {
-            var produto =  _uof.ProdutoRepository.GetById(p => p.ProdutoId == id);
+            var produto =  await _uof.ProdutoRepository.GetById(p => p.ProdutoId == id);
 
             if (produto == null)
             {
@@ -82,12 +93,12 @@ namespace Web_Api_Macorrati.Controllers
         /// <param name="produtoDto"></param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult Post([FromBody]ProdutoDTO produtoDto)
+        public async Task<ActionResult> Post([FromBody]ProdutoDTO produtoDto)
         {
             var produto = _mapper.Map<Produto>(produtoDto); 
 
             _uof.ProdutoRepository.Add(produto);
-            _uof.Commit();
+            await _uof.Commit();
 
             var produtoDTO = _mapper.Map<ProdutoDTO>(produto); 
 
@@ -96,7 +107,7 @@ namespace Web_Api_Macorrati.Controllers
 
         //  api/produtos/1
         [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] ProdutoDTO produtoDto)
+        public async Task<ActionResult> Put(int id, [FromBody] ProdutoDTO produtoDto)
         {
             if(id != produtoDto.ProdutoId)
             {
@@ -106,16 +117,16 @@ namespace Web_Api_Macorrati.Controllers
             var produto = _mapper.Map<Produto>(produtoDto); //Mapeio produtoDto para Produto
 
             _uof.ProdutoRepository.Update(produto);
-            _uof.Commit(); 
+            await _uof.Commit(); 
 
             return Ok(); 
         }
 
         //  api/produtos/1
         [HttpDelete("{id}")]
-        public ActionResult<ProdutoDTO> Delete(int id)
+        public async Task<ActionResult<ProdutoDTO>> Delete(int id)
         {
-            var produto = _uof.ProdutoRepository.GetById(p => p.ProdutoId == id); 
+            var produto = await _uof.ProdutoRepository.GetById(p => p.ProdutoId == id); 
 
             if (produto == null)
             {
@@ -123,7 +134,7 @@ namespace Web_Api_Macorrati.Controllers
             }
 
             _uof.ProdutoRepository.Delete(produto);
-            _uof.Commit();
+            await _uof.Commit();
 
             //retorna:
             var produtoDTO = _mapper.Map<ProdutoDTO>(produto); 

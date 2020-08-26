@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -16,12 +17,11 @@ using Web_Api_Macorrati.Repository;
 
 namespace Web_Api_Macorrati.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiConventionType(typeof(DefaultApiConventions))] // Documenta todos os tipos de retornos no swagger
     [Produces("application/json")]
-    //[Authorize(AuthenticationSchemes = "Bearer")]
     [Route("api/[Controller]")]
     [ApiController]
-    //[EnableCors("PermitirApiRequest")]
     public class CategoriasController : ControllerBase
     {
         private readonly IUnitOfWork _uof;
@@ -34,14 +34,21 @@ namespace Web_Api_Macorrati.Controllers
  
         }
 
+        [AllowAnonymous]
+        [HttpGet("teste")]
+        public string GetTeste()
+        {
+            return $"CategoriasController - {DateTime.Now.ToLongDateString().ToString()}"; 
+        }
+
         /// <summary>
         /// Obtém os produtos relacionados para cada categoria
         /// </summary>
         /// <returns>Objetos Categoria e respectivo Objetos Produtos</returns>
         [HttpGet("produtos")] //Retornas as categorias e os produtos 
-        public ActionResult<IEnumerable<CategoriaDTO>> GetCategoriasProdutos()
+        public async Task<ActionResult<IEnumerable<CategoriaDTO>>> GetCategoriasProdutos()
         {
-            var categorias = _uof.CategoriaRepository.GetCategoriasProdutos().ToList();
+            var categorias = await _uof.CategoriaRepository.GetCategoriasProdutos();
 
             var categoriasDTO = _mapper.Map<List<CategoriaDTO>>(categorias);
 
@@ -53,11 +60,11 @@ namespace Web_Api_Macorrati.Controllers
         /// </summary>
         /// <returns>Lista de Categorias</returns>
         [HttpGet]
-        public ActionResult<IEnumerable<CategoriaDTO>> Get()
+        public async Task<ActionResult<IEnumerable<CategoriaDTO>>> Get()
         {
             try
             {
-                var categorias = _uof.CategoriaRepository.Get().ToList();
+                var categorias = await _uof.CategoriaRepository.Get().ToListAsync();
 
                 var categoriasDTO = _mapper.Map<List<CategoriaDTO>>(categorias);
                 //throw new Exception(); //lançar uma exception para teste
@@ -76,9 +83,9 @@ namespace Web_Api_Macorrati.Controllers
         /// <param name="id">Codigo sa categoria</param>
         /// <returns>Objetos Categoria</returns>
         [HttpGet("{id}", Name = "ObterCategoria")]
-        public ActionResult<CategoriaDTO> Get(int id)
+        public async Task<ActionResult<CategoriaDTO>> Get(int id)
         {
-            var categoria = _uof.CategoriaRepository.GetById(c => c.CategoriaId == id);
+            var categoria = await _uof.CategoriaRepository.GetById(c => c.CategoriaId == id);
 
             if (categoria == null)
             {
@@ -107,12 +114,12 @@ namespace Web_Api_Macorrati.Controllers
         /// <returns>O objeto Categoria incluida</returns>
         /// <remarks>Retorna um objeto Categoria incluído</remarks>
         [HttpPost]
-        public ActionResult Post([FromBody] CategoriaDTO categoriaDto)
+        public async Task<ActionResult> Post([FromBody] CategoriaDTO categoriaDto)
         {
             var categoria = _mapper.Map<Categoria>(categoriaDto); 
 
             _uof.CategoriaRepository.Add(categoria);
-            _uof.Commit();
+            await _uof.Commit(); 
 
             var categoriaDTO = _mapper.Map<CategoriaDTO>(categoria); 
 
@@ -120,7 +127,7 @@ namespace Web_Api_Macorrati.Controllers
         }
 
         [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] CategoriaDTO categoriaDto)
+        public async Task<ActionResult> Put(int id, [FromBody] CategoriaDTO categoriaDto)
         {
             if (id != categoriaDto.CategoriaId)
             {
@@ -130,15 +137,15 @@ namespace Web_Api_Macorrati.Controllers
             var categoria = _mapper.Map<Categoria>(categoriaDto); 
 
             _uof.CategoriaRepository.Update(categoria); 
-            _uof.Commit();
+            await _uof.Commit();
 
             return Ok();
         }
 
         [HttpDelete("{id}")]
-        public ActionResult<CategoriaDTO> Delete(int id)
+        public async Task<ActionResult<CategoriaDTO>> Delete(int id)
         {
-            var categoria = _uof.CategoriaRepository.GetById(c => c.CategoriaId == id); 
+            var categoria = await _uof.CategoriaRepository.GetById(c => c.CategoriaId == id); 
 
             if (categoria == null) 
             {
@@ -146,7 +153,7 @@ namespace Web_Api_Macorrati.Controllers
             }
 
             _uof.CategoriaRepository.Delete(categoria);
-            _uof.Commit();
+            await _uof.Commit();
 
             var categoriaDTO = _mapper.Map<CategoriaDTO>(categoria); 
 

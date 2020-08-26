@@ -43,13 +43,13 @@ namespace Web_Api_Macorrati
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //services.AddCors(); 
             services.AddCors(options =>
             {
-                options.AddPolicy("PermitirApiRequest",
-                    builder =>
-                    builder.WithOrigins("http://apirequest.io/")
-                    .WithMethods("GET")
-                    );
+                options.AddPolicy("EnableCORS", builder =>
+                {
+                    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().Build(); 
+                }); 
             });
 
             //Config Auto mapper
@@ -114,10 +114,6 @@ namespace Web_Api_Macorrati
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
 
-                var security = new Dictionary<string, IEnumerable<string>>
-                {
-                    {"Bearer", new string[] { } },
-                };
             });
 
             //services.AddApiVersioning(options =>
@@ -173,7 +169,7 @@ namespace Web_Api_Macorrati
             });
 
             ////CORS
-            //app.UseCors();
+            app.UseCors("EnableCORS");
 
             app.UseEndpoints(endpoints =>
             {
