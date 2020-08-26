@@ -13,6 +13,10 @@ namespace Web_Api_Macorrati.Repository
         Task<T> GetById(Expression<Func<T, bool>> predicate);
         void Add(T entity);
         void Update(T entity);
-        void Delete(T entity); 
+        void Delete(T entity);
+
+        List<T> LocalizaPagina<Tipo>(int pagina, int tamanhoPagina) where Tipo : class;
+
+        int GetTotalRegistros(); 
     }
 }

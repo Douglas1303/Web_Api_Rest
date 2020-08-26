@@ -76,6 +76,32 @@ namespace Web_Api_Macorrati.Controllers
                 return BadRequest(); 
             }
         }
+        [HttpGet("Paginacao")]
+        public ActionResult<IEnumerable<CategoriaDTO>> GetPaginacao(int pag=1, int reg=5)
+        {
+            try
+            {
+                if (reg > 99)
+                    reg = 5; 
+
+                var categorias =  _uof.CategoriaRepository.LocalizaPagina<Categoria>(pag, reg).ToList();
+
+                var totalDeRegistros = _uof.CategoriaRepository.GetTotalRegistros();
+                var numeroPaginas = (int)Math.Ceiling((double)totalDeRegistros / reg);
+
+                Response.Headers["X-Total-Registros"] = totalDeRegistros.ToString();
+                Response.Headers["X-Numeros-Paginas"] = numeroPaginas.ToString(); 
+
+                var categoriasDTO = _mapper.Map<List<CategoriaDTO>>(categorias);
+                //throw new Exception(); //lançar uma exception para teste
+                return categoriasDTO;
+            }
+            catch (Exception)
+            {
+
+                return BadRequest();
+            }
+        }
 
         /// <summary>
         /// Obter uma categoria pelo id 
