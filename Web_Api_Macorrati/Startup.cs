@@ -26,6 +26,7 @@ using Web_Api_Macorrati.Context;
 using Web_Api_Macorrati.DTOs.Mappings;
 using Web_Api_Macorrati.Extensions;
 using Web_Api_Macorrati.Filters;
+using Web_Api_Macorrati.GraphQL;
 using Web_Api_Macorrati.Logging;
 using Web_Api_Macorrati.Repository;
 using Web_Api_Macorrati.Services;
@@ -175,8 +176,10 @@ namespace Web_Api_Macorrati
             ////CORS
             app.UseCors("EnableCORS");
 
+            //GraphQL 
+            app.UseMiddleware<TestGraphQLMiddleware>(); 
+            
             //OData
-
             app.UseMvc(Options =>
             {
                 Options.EnableDependencyInjection();
