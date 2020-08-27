@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -87,6 +88,9 @@ namespace Web_Api_Macorrati
                     IssuerSigningKey = new SymmetricSecurityKey(
                     Encoding.UTF8.GetBytes(Configuration["Jwt:key"]))
                 });
+
+            //OData
+            services.AddOData(); 
 
             //Swagger 
             services.AddSwaggerGen(c =>
@@ -170,6 +174,14 @@ namespace Web_Api_Macorrati
 
             ////CORS
             app.UseCors("EnableCORS");
+
+            //OData
+
+            app.UseMvc(Options =>
+            {
+                Options.EnableDependencyInjection();
+                Options.Expand().Select().Count().OrderBy().Filter();
+            }); 
 
             app.UseEndpoints(endpoints =>
             {
