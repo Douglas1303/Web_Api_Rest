@@ -21,6 +21,7 @@ namespace Web_Api_Macorrati
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.UseIISIntegration(); 
                 });
     }
 }

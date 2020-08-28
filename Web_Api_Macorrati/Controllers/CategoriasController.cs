@@ -38,8 +38,9 @@ namespace Web_Api_Macorrati.Controllers
         [HttpGet("teste")]
         public string GetTeste()
         {
-            return $"CategoriasController - {DateTime.Now.ToLongDateString().ToString()}"; 
+            return $"CategoriasController - {DateTime.Now.ToLongDateString()}";
         }
+
 
         /// <summary>
         /// Obtém os produtos relacionados para cada categoria

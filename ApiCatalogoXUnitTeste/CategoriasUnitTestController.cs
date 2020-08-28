@@ -70,7 +70,7 @@ namespace ApiCatalogoXUnitTeste
             var data = controller.Get();
 
             //Assert 
-            Assert.IsType<BadRequestResult>(data.Result); 
+            Assert.IsType<BadRequestResult>(data.Value); 
         }
 
         //GET que retorna uma lista de objetos categoria
