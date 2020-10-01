@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ using Web_Api_Macorrati.Context;
 using Web_Api_Macorrati.DTOs;
 using Web_Api_Macorrati.Filters;
 using Web_Api_Macorrati.Models;
+using Web_Api_Macorrati.Pagination;
 using Web_Api_Macorrati.Repository;
 
 namespace Web_Api_Macorrati.Controllers
@@ -53,20 +55,24 @@ namespace Web_Api_Macorrati.Controllers
         /// <returns>Retorna uma lista de objetos Produto</returns>
         // api/produtos
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProdutoDTO>>> Get()
+        public ActionResult<IEnumerable<ProdutoDTO>> Get([FromQuery]ProdutosParameters produtosParameters)
         {
-            try
-            {
-                var produtos = await _uof.ProdutoRepository.Get().ToListAsync();
+            var produtos = _uof.ProdutoRepository.GetProdutos(produtosParameters);
 
-                var produtosDTO = _mapper.Map<List<ProdutoDTO>>(produtos);
-                //throw new Exception();  //lançar uma exception para teste
-                return produtosDTO;
-            }
-            catch (Exception)
+            var metadata = new
             {
-                return BadRequest(); 
-            }
+                produtos.TotalCount,
+                produtos.PageSize,
+                produtos.CurrentPage,
+                produtos.TotalPages,
+                produtos.HasNext,
+                produtos.HasPrevious
+            };
+
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+
+            var produtosDto = _mapper.Map<List<ProdutoDTO>>(produtos);
+            return produtosDto;
         }
 
         /// <summary>

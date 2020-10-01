@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ using System.Threading.Tasks;
 using Web_Api_Macorrati.Context;
 using Web_Api_Macorrati.DTOs;
 using Web_Api_Macorrati.Models;
+using Web_Api_Macorrati.Pagination;
 using Web_Api_Macorrati.Repository;
 
 namespace Web_Api_Macorrati.Controllers
@@ -61,14 +63,25 @@ namespace Web_Api_Macorrati.Controllers
         /// </summary>
         /// <returns>Lista de Categorias</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CategoriaDTO>>> Get()
+        public ActionResult<IEnumerable<CategoriaDTO>> Get([FromQuery]CategoriasParameters categoriasParameters)
         {
             try
             {
-                var categorias = await _uof.CategoriaRepository.Get().ToListAsync();
+                var categorias =  _uof.CategoriaRepository.GetCategorias(categoriasParameters);
+
+                var metadata = new
+                {
+                    categorias.TotalCount,
+                    categorias.PageSize,
+                    categorias.CurrentPage,
+                    categorias.TotalPages,
+                    categorias.HasNext,
+                    categorias.HasPrevious
+                };
+
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
 
                 var categoriasDTO = _mapper.Map<List<CategoriaDTO>>(categorias);
-                //throw new Exception(); //lançar uma exception para teste
                 return categoriasDTO;
             }
             catch (Exception)
